@@ -38,7 +38,9 @@ public class OrderService {
                                     updateOrderRequest.getPaid());
     }
 
-
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
 
 
 //    public Order getOrder(Long orderId) {
