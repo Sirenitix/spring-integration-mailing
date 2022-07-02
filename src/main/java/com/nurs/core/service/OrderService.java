@@ -1,0 +1,40 @@
+package com.nurs.core.service;
+
+
+import com.nurs.core.dao.OrderRepository;
+import com.nurs.core.dao.PaymentRepository;
+import com.nurs.core.entity.Order;
+import com.nurs.core.entity.Payment;
+import com.nurs.core.exceptions.OrderAlreadyPaid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+
+import javax.persistence.EntityNotFoundException;
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+    private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
+
+
+    public void createOrder(Order order) {
+        orderRepository.save(order);
+    }
+
+    public Order getOrder(Long orderId) {
+        return orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public Payment pay(Long orderId, String creditCardNumber) {
+        Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
+
+        if (order.isPaid()) {
+            throw new OrderAlreadyPaid();
+        }
+
+        orderRepository.save(order.markPaid());
+        return paymentRepository.save(new Payment(order, creditCardNumber));
+    }
+}

@@ -1,4 +1,4 @@
-package com.nurs.rabbitmq;
+package com.nurs.core.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

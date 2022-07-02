@@ -1,4 +1,4 @@
-package com.nurs.rabbitmq;
+package com.nurs.core;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
