@@ -19,4 +19,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "UPDATE orders set amount =:amount , date =:date, paid =:paid, email=:email where id = :id",
             nativeQuery = true)
     void updateById(Long id, BigDecimal amount, String date,  Boolean paid, String email);
+
+    Order findByEmail(String email);
 }

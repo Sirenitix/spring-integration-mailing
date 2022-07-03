@@ -11,9 +11,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Validated
@@ -26,7 +27,7 @@ public class OrderListener {
     private final EmailService emailService;
 
     @RabbitListener(queues = MQConfig.CREATE_ORDER_QUEUE)
-    public void orderListener(@NonNull Order order) {
+    public void orderListener(@NotNull Order order) {
         log.info(order + " - order");
         orderService.createOrder(order);
         emailService.sendOrderEmail(order.getEmail());
@@ -34,19 +35,19 @@ public class OrderListener {
     }
 
     @RabbitListener(queues = MQConfig.DELETE_ORDER_QUEUE)
-    public void deleteOrderListener(@NonNull DeleteOrderRequest deleteOrderRequest) {
+    public void deleteOrderListener(@NotNull DeleteOrderRequest deleteOrderRequest) {
         log.info(deleteOrderRequest.getId() + " - order id to delete");
         orderService.deleteOrder(deleteOrderRequest.getId());
     }
 
     @RabbitListener(queues = MQConfig.UPDATE_ORDER_QUEUE)
-    public void updateOrderListener(@NonNull UpdateOrderRequest updateOrderRequest) {
+    public void updateOrderListener(@NotNull UpdateOrderRequest updateOrderRequest) {
         log.info(updateOrderRequest + " - order to update");
         orderService.updateOrder(updateOrderRequest);
     }
 
     @RabbitListener(queues = MQConfig.CREATE_PAYMENT_QUEUE)
-    public void paymentListener(@NonNull PaymentRequest paymentRequest) {
+    public void paymentListener(@NotNull PaymentRequest paymentRequest) {
         log.info(paymentRequest + " - payment");
         orderService.createPayment(paymentRequest);
         emailService.sendPaymentEmail(paymentRequest.getOrderId());
