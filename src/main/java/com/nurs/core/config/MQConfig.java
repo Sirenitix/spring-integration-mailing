@@ -20,10 +20,14 @@ public class MQConfig {
 
     public static final String DELETE_ORDER_QUEUE = "delete_order";
 
-
     public static final String CREATE_PAYMENT_QUEUE = "create_payment";
 
+    public static final String EMAIL_ORDER_QUEUE = "order_email";
+
+    public static final String EMAIL_PAYMENT_QUEUE = "payment_email";
+
     public static final String EXCHANGE = "order_exchange";
+
     public static final String ROUTING_KEY_1 = "routing_key_1";
 
     public static final String ROUTING_KEY_2 = "routing_key_2";
@@ -31,6 +35,10 @@ public class MQConfig {
     public static final String ROUTING_KEY_3 = "routing_key_3";
 
     public static final String ROUTING_KEY_4 = "routing_key_4";
+
+    public static final String ROUTING_KEY_5 = "routing_key_5";
+
+    public static final String ROUTING_KEY_6 = "routing_key_6";
 
     @Bean(name = "firstQueue")
     public Queue firstQueue() {
@@ -48,10 +56,13 @@ public class MQConfig {
     }
 
     @Bean(name = "fourthQueue")
-    public Queue fourthQueue() {
-        return new Queue(CREATE_PAYMENT_QUEUE);
-    }
+    public Queue fourthQueue() {return new Queue(CREATE_PAYMENT_QUEUE);}
 
+    @Bean(name = "fifthQueue")
+    public Queue fifthQueue() {return new Queue(EMAIL_ORDER_QUEUE);}
+
+    @Bean(name = "sixthQueue")
+    public Queue sixthQueue() {return new Queue(EMAIL_PAYMENT_QUEUE);}
 
     @Bean
     public TopicExchange exchange() {
@@ -91,6 +102,21 @@ public class MQConfig {
                 .with(ROUTING_KEY_4);
     }
 
+    @Bean
+    public Binding binding5(@Qualifier("fifthQueue") Queue queue, TopicExchange exchange) {
+        return BindingBuilder
+                .bind(queue)
+                .to(exchange)
+                .with(ROUTING_KEY_5);
+    }
+
+    @Bean
+    public Binding binding6(@Qualifier("sixthQueue") Queue queue, TopicExchange exchange) {
+        return BindingBuilder
+                .bind(queue)
+                .to(exchange)
+                .with(ROUTING_KEY_6);
+    }
 
 
     @Bean

@@ -5,11 +5,13 @@ import com.nurs.core.dto.DeleteOrderRequest;
 import com.nurs.core.dto.PaymentRequest;
 import com.nurs.core.dto.UpdateOrderRequest;
 import com.nurs.core.entity.Order;
+import com.nurs.core.service.EmailService;
 import com.nurs.core.service.OrderService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -21,10 +23,14 @@ public class OrderListener {
 
     private final OrderService orderService;
 
+    private final EmailService emailService;
+
     @RabbitListener(queues = MQConfig.CREATE_ORDER_QUEUE)
     public void orderListener(@NonNull Order order) {
         log.info(order + " - order");
         orderService.createOrder(order);
+        emailService.sendOrderEmail(order.getEmail());
+
     }
 
     @RabbitListener(queues = MQConfig.DELETE_ORDER_QUEUE)
@@ -43,12 +49,9 @@ public class OrderListener {
     public void paymentListener(@NonNull PaymentRequest paymentRequest) {
         log.info(paymentRequest + " - payment");
         orderService.createPayment(paymentRequest);
+        emailService.sendPaymentEmail(paymentRequest.getOrderId());
     }
 
-//    @Scheduled(fixedDelay = 1000, initialDelay = 1000)
-//    public void scheduleFixedDelayTask() {
-//        log.info(
-//                "Fixed delay task - " + System.currentTimeMillis() / 1000);
-//    }
+//
 
 }

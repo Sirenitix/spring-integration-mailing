@@ -16,7 +16,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE orders set amount =:amount , date =:date, paid =:paid where id = :id",
+    @Query(value = "UPDATE orders set amount =:amount , date =:date, paid =:paid, email=:email where id = :id",
             nativeQuery = true)
-    void updateById(Long id, BigDecimal amount, String date,  Boolean paid);
+    void updateById(Long id, BigDecimal amount, String date,  Boolean paid, String email);
 }

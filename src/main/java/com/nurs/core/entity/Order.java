@@ -3,30 +3,30 @@ package com.nurs.core.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity(name = "orders")
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-@NoArgsConstructor
 public class Order {
     @Id
     @GeneratedValue
     private Long id;
-    @NonNull
+    @NotNull
     private String date;
-    @NonNull
+    @NotNull
     private BigDecimal amount;
-    @NonNull
+    @NotNull
     private Boolean paid;
+    @NotNull
+    private String email;
 
     public boolean isPaid() {
         return paid;

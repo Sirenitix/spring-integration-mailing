@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Data
@@ -11,13 +13,15 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class UpdateOrderRequest {
 
-    @NonNull
+    @NotNull
     private Long id;
-    @NonNull
+    @NotNull
     private String date;
-    @NonNull
+    @NotNull
     private BigDecimal amount;
-    @NonNull
+    @NotNull
     private Boolean paid;
+    @NotNull
+    private String email;
 
 }

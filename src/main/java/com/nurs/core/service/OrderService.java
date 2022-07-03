@@ -1,6 +1,7 @@
 package com.nurs.core.service;
 
 
+import com.nurs.core.config.MQConfig;
 import com.nurs.core.dao.OrderRepository;
 import com.nurs.core.dao.PaymentRepository;
 import com.nurs.core.dto.PaymentRequest;
@@ -9,6 +10,8 @@ import com.nurs.core.entity.Order;
 import com.nurs.core.entity.Payment;
 import com.nurs.core.exceptions.OrderAlreadyPaid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -20,6 +23,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     private final PaymentRepository paymentRepository;
+
 
 
     public void createOrder(Order order) {
@@ -34,7 +38,8 @@ public class OrderService {
         orderRepository.updateById( updateOrderRequest.getId(),
                                     updateOrderRequest.getAmount(),
                                     updateOrderRequest.getDate(),
-                                    updateOrderRequest.getPaid());
+                                    updateOrderRequest.getPaid(),
+                                    updateOrderRequest.getEmail());
     }
 
     public List<Order> getAllOrders() {
