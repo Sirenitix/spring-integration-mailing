@@ -3,6 +3,7 @@ package com.nurs.core.service;
 
 import com.nurs.core.dao.OrderRepository;
 import com.nurs.core.dao.PaymentRepository;
+import com.nurs.core.dto.PaymentRequest;
 import com.nurs.core.dto.UpdateOrderRequest;
 import com.nurs.core.entity.Order;
 import com.nurs.core.entity.Payment;
@@ -10,9 +11,7 @@ import com.nurs.core.exceptions.OrderAlreadyPaid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,21 +41,23 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-
-//    public Order getOrder(Long orderId) {
-//        return orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
-//    }
-//
-//    public Payment pay(Long orderId, String creditCardNumber) {
-//        Order order = orderRepository.findById(orderId).orElseThrow(EntityNotFoundException::new);
-//
-//        if (order.isPaid()) {
-//            throw new OrderAlreadyPaid();
-//        }
-//
-//        orderRepository.save(order.markPaid());
-//        return paymentRepository.save(new Payment(order, creditCardNumber));
-//    }
+    public Order getOrderById(Long id) {
+        if(orderRepository.findById(id).isPresent()){
+            return orderRepository.findById(id).get();
+        }
+        return null;
+    }
 
 
+
+    public void createPayment(PaymentRequest paymentRequest) {
+        Order order = orderRepository.findById(paymentRequest.getOrderId()).orElseThrow(EntityNotFoundException::new);
+
+        if (order.isPaid()) {
+            throw new OrderAlreadyPaid();
+        }
+
+        orderRepository.save(order.markPaid());
+        paymentRepository.save(new Payment(order, paymentRequest.getCreditCardNumber()));
+    }
 }
