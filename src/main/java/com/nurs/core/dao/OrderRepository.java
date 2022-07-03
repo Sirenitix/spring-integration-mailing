@@ -1,6 +1,5 @@
 package com.nurs.core.dao;
 
-import com.nurs.core.dto.UpdateOrderRequest;
 import com.nurs.core.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

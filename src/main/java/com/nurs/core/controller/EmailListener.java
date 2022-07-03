@@ -3,7 +3,6 @@ package com.nurs.core.controller;
 import com.nurs.core.config.MQConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,7 +25,6 @@ public class EmailListener {
         log.info("Scheduled task order");
         while (true) {
             String emailOrder = (String) template.receiveAndConvert(MQConfig.EMAIL_ORDER_QUEUE);
-            log.info(emailOrder + " - email order");
             if(emailOrder == null) break;
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("noreply@nurs.com");
@@ -36,7 +34,6 @@ public class EmailListener {
             emailSender.send(message);
 
         }
-        log.info("exit order");
     }
 
     @Scheduled(fixedRate = 5000, initialDelay = 5000)
@@ -44,7 +41,6 @@ public class EmailListener {
         log.info("Scheduled task payment");
         while (true){
             String emailPayment = (String) template.receiveAndConvert(MQConfig.EMAIL_PAYMENT_QUEUE);
-            log.info(emailPayment + " - email payment");
             if(emailPayment == null) break;
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("noreply@nurs.com");
@@ -52,9 +48,7 @@ public class EmailListener {
             message.setSubject("From shop.org");
             message.setText("Your payment is created");
             emailSender.send(message);
-            emailPayment = (String) template.receiveAndConvert(MQConfig.EMAIL_PAYMENT_QUEUE);
         }
-        log.info("exit payment");
     }
 
 }

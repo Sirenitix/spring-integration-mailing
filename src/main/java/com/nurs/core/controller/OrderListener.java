@@ -7,7 +7,6 @@ import com.nurs.core.dto.UpdateOrderRequest;
 import com.nurs.core.entity.Order;
 import com.nurs.core.service.EmailService;
 import com.nurs.core.service.OrderService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

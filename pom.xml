@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.nurs</groupId>
-	<artifactId>spring-rabbitmq-consumer</artifactId>
+	<artifactId>spring-integration-core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>spring-rabbitmq-consumer</name>
+	<name>spring-integration-core</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
@@ -33,6 +33,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+			<version>1.18.22</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
