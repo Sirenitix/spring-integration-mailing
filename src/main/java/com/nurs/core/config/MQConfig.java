@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class MQConfig {
 
-    public static final String CREATE_ORDER_QUEUE = "create_order";
+    public static final String CREATE_ORDER_QUEUE = "new_order";
 
     public static final String UPDATE_ORDER_QUEUE = "update_order";
 
@@ -26,7 +26,7 @@ public class MQConfig {
 
     public static final String EMAIL_PAYMENT_QUEUE = "payment_email";
 
-    public static final String EXCHANGE = "order_exchange";
+    public static final String EXCHANGE = "exchange";
 
     public static final String ROUTING_KEY_1 = "routing_key_1";
 
