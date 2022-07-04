@@ -1,0 +1,28 @@
+server:
+  port: 8002
+spring:
+  rabbitmq:
+    addresses: localhost:5672
+  task:
+    scheduling:
+      pool:
+        size: 5
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: suleevn@gmail.com
+    password: xormmwlwrlsiwxfr
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    protocol: smtp
+    test-connection: false
+
+email: suleevn@gmail.com
+password: xormmwlwrlsiwxfr
+
+

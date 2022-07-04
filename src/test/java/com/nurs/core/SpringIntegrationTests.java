@@ -1,142 +1,69 @@
 package com.nurs.core;
 
-import com.nurs.core.dao.OrderRepository;
-import com.nurs.core.dao.PaymentRepository;
-import com.nurs.core.dto.OrderRequest;
-import com.nurs.core.dto.PaymentRequest;
-import com.nurs.core.dto.UpdateOrderRequest;
-import com.nurs.core.entity.Order;
-import com.nurs.core.entity.Payment;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit.GreenMailRule;
+import com.icegreen.greenmail.user.GreenMailUser;
+import com.icegreen.greenmail.util.GreenMailUtil;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.nurs.core.entity.Mail;
+import com.nurs.core.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.messaging.MessagingException;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
+
+import javax.mail.internet.MimeMessage;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Arrays;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @Slf4j
+@SpringBootTest
+@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class SpringIntegrationTests {
+@TestPropertySource(locations = "classpath:application-test.yml")
+class SpringIntegrationTests  {
 
 	@Autowired
-	private WebTestClient webClient;
+	private EmailService emailService;
 
-	private static MockWebServer mockWebServer;
+	@Rule
+	public SmtpServerRule smtpServerRule = new SmtpServerRule(2525);
 
-	@Autowired
-	private OrderRepository orderRepository;
 
-	@Autowired
-	private PaymentRepository paymentRepository;
-
-	@DynamicPropertySource
-	static void registerProperties(DynamicPropertyRegistry registry) {
-		registry.add("exchange-rate-api.base-url", () -> mockWebServer.url("/").url().toString());
-	}
-
-	@BeforeAll
-	static void setupMockWebServer() throws IOException {
-		mockWebServer = new MockWebServer();
-		mockWebServer.start();
-	}
 
 	@Test
-	void createOrder() {
-		BigDecimal amount = new BigDecimal("1000.00");
-		String email = "n.suleev@yandex.ru";
-		OrderRequest orderRequest = new OrderRequest(amount,email);
-		webClient.post().uri("localhost:8000/order")
-				.accept(MediaType.APPLICATION_JSON)
-				.body(Mono.just(orderRequest), OrderRequest.class)
-				.exchange()
-				.expectStatus().isOk();
-		Order actualOrder = orderRepository.findByEmail(email);
-		assertThat(email).isEqualTo(actualOrder.getEmail());
-		assertThat(amount).isEqualTo(actualOrder.getAmount());
-	}
+	public void shouldSendSingleMail() throws Throwable {
+		smtpServerRule.before();
+		Mail mail = new Mail();
+		mail.setFrom("no-reply@memorynotfound.com");
+		mail.setTo("info@memorynotfound.com");
+		mail.setSubject("Spring Mail Integration Testing with JUnit and GreenMail Example");
+		mail.setContent("We show how to write Integration Tests using Spring and GreenMail.");
 
-	@Test
-	void deleteOrder() {
-		createOrder();
-		int id = 1;
-		webClient.delete().uri("localhost:8000/order/" + id )
-				.exchange()
-				.expectStatus().isOk();
-		Long orderId = 1L;
-		Order order = orderRepository.findById(orderId).orElse(null);
-		assertThat(order).isEqualTo(null);
-	}
+		emailService.sendSimpleMessage(mail);
 
-	@Test
-	void updateOrder() {
+		MimeMessage[] receivedMessages = smtpServerRule.getMessages();
+		log.info(Arrays.toString(receivedMessages) + " - messages");
+		assertEquals(1, receivedMessages.length);
 
-		createOrder();
+		MimeMessage current = receivedMessages[0];
 
-		Boolean testPaid = true;
-		String testMail = "test@mail.com";
-		String testDate = LocalDate.now().toString();
-		BigDecimal testAmount = new BigDecimal("500.00");
-
-		UpdateOrderRequest updateOrder = new UpdateOrderRequest();
-		updateOrder.setId(1L);
-		updateOrder.setDate(testDate);
-		updateOrder.setAmount(testAmount);
-		updateOrder.setPaid(testPaid);
-		updateOrder.setEmail(testMail);
-
-		int id = 1;
-		webClient.put().uri("localhost:8000/order/" + id )
-				.accept(MediaType.APPLICATION_JSON)
-				.body(Mono.just(updateOrder), UpdateOrderRequest.class)
-				.exchange()
-				.expectStatus().isOk();
-
-		Long orderId = 1L;
-		Order order = orderRepository.findById(orderId).orElse(null);
-
-		assertThat(order.isPaid()).isEqualTo(testPaid);
-		assertThat(order.getAmount()).isEqualTo(testAmount);
-		assertThat(order.getDate()).isEqualTo(testDate);
-		assertThat(order.getEmail()).isEqualTo(testMail);
-	}
-
-	@Test
-	void payOrder() {
-
-		createOrder();
-
-		Long testOrderId = 1L;
-		String testCard = "4636790463393611";
-
-
-		PaymentRequest paymentRequest = new PaymentRequest();
-		paymentRequest.setOrderId(testOrderId);
-		paymentRequest.setCreditCardNumber(testCard);
-
-		int id = 1;
-		webClient.post().uri("localhost:8000/order/" + id + "/payment")
-				.accept(MediaType.APPLICATION_JSON)
-				.body(Mono.just(paymentRequest), PaymentRequest.class)
-				.exchange()
-				.expectStatus().isOk();
-
-		Order order = orderRepository.findById(testOrderId).orElse(null);
-		Payment payment = paymentRepository.findByOrder(order);
-		assertThat(payment.getOrder().getId()).isEqualTo(testOrderId);
-		assertThat(payment.getCreditCardNumber()).isEqualTo(testCard);
+		assertEquals(mail.getSubject(), current.getSubject());
+		assertEquals(mail.getTo(), current.getAllRecipients()[0].toString());
+		assertTrue(String.valueOf(current.getContent()).contains(mail.getContent()));
+		smtpServerRule.after();
 
 	}
 
