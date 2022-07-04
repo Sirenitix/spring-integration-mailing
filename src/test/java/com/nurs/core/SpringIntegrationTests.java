@@ -49,8 +49,8 @@ class SpringIntegrationTests  {
 		Mail mail = new Mail();
 		mail.setFrom("no-reply@memorynotfound.com");
 		mail.setTo("info@memorynotfound.com");
-		mail.setSubject("Spring Mail Integration Testing with JUnit and GreenMail Example");
-		mail.setContent("We show how to write Integration Tests using Spring and GreenMail.");
+		mail.setSubject("Spring Mail Integration Testing with JUnit and GreenMail");
+		mail.setContent("Simple test");
 
 		emailService.sendSimpleMessage(mail);
 
